@@ -1,0 +1,39 @@
+name: DevOps CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Tragem codul tău pe serverele GitHub
+    - name: Check out repository code
+      uses: actions/checkout@v4
+
+    # 2. Configurăm Python pe serverul lor
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    # 3. Instalăm un utilitar de verificare a sintaxei (Flake8)
+    - name: Install Linting Tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8
+        
+    # 4. Verificăm codul să nu aibă erori majore de sintaxă
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    # 5. Testăm dacă Dockerfile-ul din week6 se compilează cu succes
+    - name: Build Docker Image
+      run: |
+        cd week6
+        docker build -t flask-test-app:latest .

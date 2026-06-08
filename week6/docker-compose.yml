@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  web-app:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      redis-db:
+        condition: service_healthy
+
+  redis-db:
+    image: redis:alpine
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  redis-data:
